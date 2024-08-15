@@ -44,7 +44,7 @@ parser.add_argument("--n_hid", type=int, default=128)
 parser.add_argument("--n_inp", type=int, default=128)
 parser.add_argument("--n_heads", type=int, default=8) 
 parser.add_argument("--clip", type=int, default=1.0)
-parser.add_argument("--max_lr", type=float, default=1e-3) ## 원본 1e-3
+parser.add_argument("--max_lr", type=float, default=1e-3)
 parser.add_argument("--n_batch", type=int, default=256)
 parser.add_argument("--max_length", type=int, default=7)
 parser.add_argument("--dataset_name", type=str, default="amz") 
@@ -214,7 +214,6 @@ class HGTLayer(nn.Module):
                 relation_pri = self.relation_pri[e_id]
                 relation_msg = self.relation_msg[e_id]
 
-                # 미리 key와 value 값에 matrix을 곱했다.
                 k = torch.einsum("bij,ijk->bik", k, relation_att)
                 v = torch.einsum("bij,ijk->bik", v, relation_msg)
 
@@ -614,7 +613,7 @@ del nnode[0]
 
 cnt = 0 
 
-for i in nnode: ### 여기서부터 다시 보기!!!!!!!@@@@@@@@@
+for i in nnode: 
     ori_idx = str(int(i.split(" ")[0]))
     temp = [ori_idx] + i.split(" ")[1:]
     temp = " ".join(temp)
@@ -771,7 +770,7 @@ def train(model, G):
             loss = criterion(pred_scores.float(), torch.tensor(train_labels[start:end]).cuda().float())
             loss_arr.append(loss.item())
             optimizer.zero_grad()
-            loss.backward() # 원래 retain_graph=True 없음.
+            loss.backward() 
             torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip)
             optimizer.step()
         print("avg_loss:",np.mean(loss_arr))
@@ -907,7 +906,7 @@ scheduler = torch.optim.lr_scheduler.OneCycleLR(
         optimizer, epochs = args.n_epoch , steps_per_epoch = len(trainset) // args.n_batch + 1, max_lr = args.max_lr
     )
 #########################
-# u,v 추가하기 
+
 for i in range(len(trainset[0].unique())):
     i = i+1
     globals()[f'u_{i}'] ,  globals()[f'v_{i}'] = G.edges(etype = str(i))
